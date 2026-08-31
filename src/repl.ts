@@ -1,48 +1,38 @@
-import * as readline from "node:readline";
-
-import { getCommands } from "./command.js";
-
-const inputInterface = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
-    prompt: "Pokedex > ",
-});
+import { State } from "./state.js";
 
 export function cleanInput(input: string): string[] {
     return input.split(' ').map((item) => item.trim().toLowerCase()).filter((item) => item !== '');
 }
 
-export function logWelcomeMessage() {
+export function logWelcomeMessage(state: State) {
     console.log(`Welcome to the Pokedex!
 Usage:\n\n`);
 
-    for (const command of Object.values(getCommands())) {
+    for (const command of Object.values(state.commands)) {
         console.log(`  ${command.name}: ${command.description}`);
     }
-
 }
 
-export function startREPL() {
-    logWelcomeMessage();
-    inputInterface.prompt();
+export function startREPL(state: State) {
+    logWelcomeMessage(state);
+    state.readline.prompt();
 
-    inputInterface.on("line", (line: string) => {
+    state.readline.on("line", (line: string) => {
         const words = cleanInput(line);
         if (words.length === 0) {
-            inputInterface.prompt();
+            state.readline.prompt();
             return;
         }
 
-        // TODO: dispatch on words[0] as the command name
-        // console.log(`Your command was: ${words[0]}`);
+        const commandName = words[0];
+        const command = state.commands[commandName];
 
-        if (words[0] in getCommands()) {
-            const command = getCommands()[words[0]];
-            command.callback(getCommands());
+        if (command) {
+            command.callback(state);
         } else {
-            console.log(`Unknown command: ${words[0]}`);
+            console.log(`Unknown command: ${commandName}`);
         }
 
-        inputInterface.prompt();
+        state.readline.prompt();
     });
 }
