@@ -17,22 +17,30 @@ export function startREPL(state: State) {
     logWelcomeMessage(state);
     state.readline.prompt();
 
+    let commandQueue: Promise<void> = Promise.resolve();
+
     state.readline.on("line", (line: string) => {
-        const words = cleanInput(line);
-        if (words.length === 0) {
+        commandQueue = commandQueue.then(async () => {
+            const words = cleanInput(line);
+            if (words.length === 0) {
+                state.readline.prompt();
+                return;
+            }
+
+            const commandName = words[0];
+            const command = state.commands[commandName];
+
+            if (command) {
+                try {
+                    await command.callback(state);
+                } catch (err) {
+                    console.log(`Error: ${err instanceof Error ? err.message : String(err)}`);
+                }
+            } else {
+                console.log(`Unknown command: ${commandName}`);
+            }
+
             state.readline.prompt();
-            return;
-        }
-
-        const commandName = words[0];
-        const command = state.commands[commandName];
-
-        if (command) {
-            command.callback(state);
-        } else {
-            console.log(`Unknown command: ${commandName}`);
-        }
-
-        state.readline.prompt();
+        });
     });
 }

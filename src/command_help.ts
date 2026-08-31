@@ -1,6 +1,6 @@
 import { State } from "./state.js";
 
-export function commandHelp(state: State) {
+export async function commandHelp(state: State): Promise<void> {
     console.log("This is the help section!");
     console.log("Usage:\n");
 
