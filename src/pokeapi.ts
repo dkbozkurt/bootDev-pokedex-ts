@@ -18,6 +18,11 @@ export class PokeAPI {
         return this.fetchWithCache<Location>(url);
     }
 
+    async fetchPokemon(pokemonName: string): Promise<Pokemon> {
+        const url = `${PokeAPI.baseURL}/pokemon/${pokemonName}`;
+        return this.fetchWithCache<Pokemon>(url);
+    }
+
     private async fetchWithCache<T>(url: string): Promise<T> {
         const cached = this.cache.get<T>(url);
         if (cached) {
@@ -100,5 +105,23 @@ export type Location = {
                 };
             }[];
         }[];
+    }[];
+};
+
+export type Pokemon = {
+    name: string;
+    base_experience: number;
+    height: number;
+    weight: number;
+    stats: {
+        base_stat: number;
+        stat: {
+            name: string;
+        };
+    }[];
+    types: {
+        type: {
+            name: string;
+        };
     }[];
 };
