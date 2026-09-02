@@ -50,7 +50,7 @@ export function initState(): State {
     return {
         readline: rl,
         commands: commands,
-        pokeapi: new PokeAPI(),
+        pokeapi: new PokeAPI(5 * 60 * 1000),
         nextLocationsURL: null,
         prevLocationsURL: null,
     };
