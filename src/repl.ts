@@ -32,7 +32,8 @@ export function startREPL(state: State) {
 
             if (command) {
                 try {
-                    await command.callback(state);
+                    const args = words.slice(1);
+                    await command.callback(state, ...args);
                 } catch (err) {
                     console.log(`Error: ${err instanceof Error ? err.message : String(err)}`);
                 }
